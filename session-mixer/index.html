@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SESSIONMIX</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+
+<div id="app">
+  <!-- Transport Bar -->
+  <div id="transport">
+    <div class="logo">SESSION<span>MIX</span></div>
+    <div class="ver">v2</div>
+    <div class="t-group">
+      <button class="t-btn stop-btn" id="btn-stop" title="Stop [Esc]">■</button>
+      <button class="t-btn play-btn" id="btn-play" title="Play/Pause [Space]">▶ PLAY</button>
+    </div>
+    <div class="bpm-box">
+      <button id="bpm-dn" title="BPM −1 [↓]">−</button>
+      <span class="bpm-val" id="bpm-val">120</span>
+      <button id="bpm-up" title="BPM +1 [↑]">+</button>
+      <span class="bpm-unit">BPM</span>
+    </div>
+    <div class="pos-display">
+      <span class="bar" id="p-bar">01</span>
+      <span class="sep">.</span>
+      <span class="beat" id="p-beat">1</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="status" id="status">■ STOPPED</div>
+  </div>
+
+  <!-- Channel Tabs -->
+  <div id="ch-tabs"></div>
+
+  <!-- Iframe Stack (all apps render simultaneously) -->
+  <div id="frame-stack">
+    <div class="empty-prompt" id="empty-prompt">
+      <div class="icon">⊞</div>
+      <p>
+        LOAD YOUR HTML AUDIO APPS INTO CHANNELS 1–4<br>
+        PRESS ▶ PLAY TO START ALL APPS SIMULTANEOUSLY<br>
+        SWITCH VIEWS WITH TABS OR KEYS 1–4<br>
+        ALL CHANNELS STAY LIVE WHEN SWITCHING<br><br>
+        OPTIONAL SYNC HOOK FOR YOUR APPS:<br>
+        <code>window.addEventListener('sessionmix:transport', e =&gt; { ... })</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- Mixer Strip -->
+  <div id="mixer"></div>
+</div>
+
+<!-- Hidden file inputs for each channel -->
+<input type="file" id="fi-0" accept=".html,.htm" style="display:none">
+<input type="file" id="fi-1" accept=".html,.htm" style="display:none">
+<input type="file" id="fi-2" accept=".html,.htm" style="display:none">
+<input type="file" id="fi-3" accept=".html,.htm" style="display:none">
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

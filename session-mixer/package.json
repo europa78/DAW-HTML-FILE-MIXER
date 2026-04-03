@@ -1,0 +1,17 @@
+{
+  "name": "session-mixer",
+  "version": "2.0.0",
+  "description": "Multi-app synchronized audio mixer — load HTML audio apps into channels, mix and play simultaneously",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "vite-plugin-singlefile": "^2.0.0"
+  },
+  "author": "STB Digital",
+  "license": "MIT"
+}
