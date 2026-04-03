@@ -1,0 +1,24 @@
+# Unzip, init repo, push
+unzip session-mixer.zip
+cd session-mixer
+git init
+git add .
+git commit -m "init: SessionMix v2 — multi-app audio mixer"
+git remote add origin git@github.com:YOUR_USERNAME/session-mixer.git
+git push -u origin main
+
+# Install and run
+npm install
+npm run dev
+```
+
+**Project structure at a glance:**
+```
+src/protocol.js   → Constants, message types, shared state
+src/bridge.js     → The script injected into every app (AudioContext patching)
+src/engine.js     → Transport clock, gain routing, meter ingestion
+src/mixer.js      → Fader/pan/VU/solo/mute UI
+src/channels.js   → Iframe loading, tab switching, CSS stacking
+src/main.js       → Init, keyboard shortcuts, render loop
+src/styles.css    → All styles
+docs/SYNC-PROTOCOL.md → API spec for making your apps sync-ready
