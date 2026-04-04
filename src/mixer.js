@@ -28,7 +28,10 @@ export function buildMixer() {
     s.id = `s${i}`;
     s.innerHTML = `
       <div class="strip-label" style="color:${CHANNEL_COLORS[i]}">${CHANNEL_NAMES[i]}</div>
-      <div class="load-btn" id="lb${i}">LOAD .HTML</div>
+      <div class="load-row">
+        <div class="load-btn" id="lb${i}" title="Load project folder">LOAD APP</div>
+        <div class="load-file-btn" id="lf${i}" title="Load single .html file">FILE</div>
+      </div>
       <div class="pan-row">
         <div class="pan-knob" id="pk${i}">
           <div class="pan-dot" id="pd${i}" style="background:${CHANNEL_COLORS[i]}"></div>
@@ -54,7 +57,8 @@ export function buildMixer() {
     mx.appendChild(s);
 
     // Events
-    $(`lb${i}`).onclick = () => $(`fi-${i}`).click();
+    $(`lb${i}`).onclick = () => $(`fd-${i}`).click();  // folder picker
+    $(`lf${i}`).onclick = () => $(`fi-${i}`).click();  // single file picker
     $(`so${i}`).onclick = () => toggleSolo(i);
     $(`mu${i}`).onclick = () => toggleMute(i);
     initFader(i);

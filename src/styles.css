@@ -352,17 +352,23 @@ html, body {
   font-weight: 600;
 }
 
+.load-row {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
 .load-btn {
   font-size: 7px;
   letter-spacing: 1px;
-  padding: 2px 8px;
+  padding: 2px 6px;
   background: var(--bg-3);
   border: 1px solid var(--border-hi);
   border-radius: 3px;
   color: var(--text-2);
   cursor: pointer;
   transition: all 0.12s;
-  max-width: 66px;
+  max-width: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -370,7 +376,24 @@ html, body {
   font-family: inherit;
 }
 .load-btn:hover { border-color: var(--accent); color: var(--accent); }
-.load-btn.has-file { color: var(--text-1); }
+.load-btn.has-file { color: var(--text-1); max-width: 66px; }
+
+.load-file-btn {
+  font-size: 6px;
+  letter-spacing: 0.5px;
+  padding: 2px 3px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.load-file-btn:hover { border-color: var(--text-2); color: var(--text-2); }
+/* Hide the FILE button when an app is loaded */
+.load-btn.has-file + .load-file-btn { display: none; }
 
 .pan-row {
   display: flex;

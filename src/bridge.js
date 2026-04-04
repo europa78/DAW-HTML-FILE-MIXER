@@ -1,20 +1,23 @@
 /**
  * SessionMix Bridge
- * 
+ *
  * This script is injected into every HTML app loaded into a channel.
  * It runs BEFORE any of the app's own scripts and:
- * 
+ *
  * 1. Patches AudioContext — redirects destination connections through a
  *    GainNode → AnalyserNode chain so the parent mixer can control volume
  *    and read RMS levels.
- * 
+ *
  * 2. Listens for postMessage commands from parent (gain, transport, resume).
- * 
+ *
  * 3. Auto-detects play/stop buttons and triggers them on transport commands.
- * 
+ *
  * 4. Fires 'sessionmix:transport' CustomEvents for apps that implement
  *    the sync protocol.
- * 
+ *
+ * 5. (VFS mode) Patches fetch() and XMLHttpRequest to resolve relative
+ *    paths from the Virtual File System blob URL mapping.
+ *
  * The bridge is exported as a string so it can be injected via string
  * concatenation into the raw HTML before creating the blob URL.
  */
@@ -172,14 +175,99 @@ export const BRIDGE_SCRIPT = `<` + `script>
 <` + `/script>`;
 
 /**
- * Inject the bridge script into raw HTML content.
- * Inserts right after <head> tag, or at the very start if no <head> found.
+ * VFS Fetch Interceptor — injected when loading multi-file projects.
+ * Patches fetch() and XMLHttpRequest.open() so that relative paths
+ * (./data.json, ../samples/kick.wav, etc.) resolve from the VFS
+ * blob URL mapping at runtime. This catches dynamic fetches that
+ * couldn't be statically rewritten during VFS processing.
+ *
+ * The __VFS_MAP__ placeholder is replaced with the actual JSON mapping
+ * at injection time.
  */
-export function injectBridge(html) {
+const VFS_INTERCEPTOR = `<` + `script>
+(function() {
+  var _vfs = __VFS_MAP__;
+  if (!_vfs || !Object.keys(_vfs).length) return;
+
+  // ── Resolve a path against the VFS ──
+  function vfsResolve(url) {
+    if (!url || typeof url !== 'string') return null;
+    if (url.indexOf('blob:') === 0 || url.indexOf('data:') === 0 ||
+        url.indexOf('http://') === 0 || url.indexOf('https://') === 0) return null;
+    var clean = url;
+    if (clean.charAt(0) === '/') clean = clean.slice(1);
+    if (clean.indexOf('./') === 0) clean = clean.slice(2);
+    if (_vfs[url]) return _vfs[url];
+    if (_vfs[clean]) return _vfs[clean];
+    if (_vfs['/' + clean]) return _vfs['/' + clean];
+    if (_vfs['./' + clean]) return _vfs['./' + clean];
+    return null;
+  }
+
+  // ── Patch fetch() ──
+  var _origFetch = window.fetch;
+  window.fetch = function(input, init) {
+    var url = (typeof input === 'string') ? input : (input && input.url);
+    var resolved = vfsResolve(url);
+    if (resolved) {
+      if (typeof input === 'string') return _origFetch.call(this, resolved, init);
+      return _origFetch.call(this, new Request(resolved, input), init);
+    }
+    return _origFetch.apply(this, arguments);
+  };
+
+  // ── Patch XMLHttpRequest.open() ──
+  var _origOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {
+    var resolved = vfsResolve(url);
+    if (resolved) {
+      arguments[1] = resolved;
+    }
+    return _origOpen.apply(this, arguments);
+  };
+
+  // ── Patch Audio constructor for new Audio('./sample.wav') ──
+  var _origAudio = window.Audio;
+  if (_origAudio) {
+    window.Audio = function(src) {
+      var resolved = src ? vfsResolve(src) : null;
+      return new _origAudio(resolved || src);
+    };
+    window.Audio.prototype = _origAudio.prototype;
+  }
+
+  window.__SM_VFS = _vfs;
+})();
+<` + `/script>`;
+
+// ─── Injection Helpers ───────────────────────────────────────
+
+function insertAfterHead(html, script) {
   const headIdx = html.indexOf('<head');
   if (headIdx !== -1) {
     const closeIdx = html.indexOf('>', headIdx);
-    return html.slice(0, closeIdx + 1) + '\n' + BRIDGE_SCRIPT + '\n' + html.slice(closeIdx + 1);
+    return html.slice(0, closeIdx + 1) + '\n' + script + '\n' + html.slice(closeIdx + 1);
   }
-  return BRIDGE_SCRIPT + '\n' + html;
+  return script + '\n' + html;
+}
+
+/**
+ * Inject the bridge script into raw HTML content (single-file mode).
+ * Inserts right after <head> tag, or at the very start if no <head> found.
+ */
+export function injectBridge(html) {
+  return insertAfterHead(html, BRIDGE_SCRIPT);
+}
+
+/**
+ * Inject both the VFS fetch interceptor and the audio bridge (multi-file mode).
+ * The VFS interceptor runs first so fetch patches are in place before any
+ * app scripts execute.
+ *
+ * @param {string} html  - Processed HTML with paths already rewritten to blob URLs
+ * @param {object} vfsMapping - { relativePath: blobURL } mapping for runtime resolution
+ */
+export function injectBridgeWithVFS(html, vfsMapping) {
+  const vfsScript = VFS_INTERCEPTOR.replace('__VFS_MAP__', JSON.stringify(vfsMapping));
+  return insertAfterHead(html, vfsScript + '\n' + BRIDGE_SCRIPT);
 }
