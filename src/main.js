@@ -61,7 +61,7 @@ document.addEventListener('keydown', (e) => {
     if (state.channels[idx].loaded) {
       switchTo(idx);
     } else {
-      $(`fi-${idx}`).click();
+      $(`fd-${idx}`).click();  // open folder picker
     }
   }
 });

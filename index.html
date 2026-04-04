@@ -40,7 +40,9 @@
     <div class="empty-prompt" id="empty-prompt">
       <div class="icon">⊞</div>
       <p>
-        LOAD YOUR HTML AUDIO APPS INTO CHANNELS 1–4<br>
+        LOAD AUDIO APPS INTO CHANNELS 1–4<br>
+        SINGLE HTML FILE OR ENTIRE PROJECT FOLDER<br>
+        (HTML + JS + CSS + JSON + YAML + SAMPLES)<br><br>
         PRESS ▶ PLAY TO START ALL APPS SIMULTANEOUSLY<br>
         SWITCH VIEWS WITH TABS OR KEYS 1–4<br>
         ALL CHANNELS STAY LIVE WHEN SWITCHING<br><br>
@@ -54,11 +56,17 @@
   <div id="mixer"></div>
 </div>
 
-<!-- Hidden file inputs for each channel -->
+<!-- Hidden file inputs — single HTML file per channel -->
 <input type="file" id="fi-0" accept=".html,.htm" style="display:none">
 <input type="file" id="fi-1" accept=".html,.htm" style="display:none">
 <input type="file" id="fi-2" accept=".html,.htm" style="display:none">
 <input type="file" id="fi-3" accept=".html,.htm" style="display:none">
+
+<!-- Hidden folder inputs — multi-file project per channel -->
+<input type="file" id="fd-0" webkitdirectory style="display:none">
+<input type="file" id="fd-1" webkitdirectory style="display:none">
+<input type="file" id="fd-2" webkitdirectory style="display:none">
+<input type="file" id="fd-3" webkitdirectory style="display:none">
 
 <script type="module" src="/src/main.js"></script>
 </body>

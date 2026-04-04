@@ -43,6 +43,7 @@ export function createChannelState() {
     soloed: false,
     level: 0,
     decay: 0,
+    vfsBlobUrls: null,  // Map of blob URLs for multi-file projects (cleaned up on unload)
   };
 }
 
